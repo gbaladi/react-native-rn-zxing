@@ -44,7 +44,7 @@ public class RnZxingModule extends ReactContextBaseJavaModule {
         // integrator.setBeepEnabled(false);
         // integrator.setTorchEnabled(false);
         integrator.setBarcodeImageEnabled(false);
-        integrator.initiateScan()
+        integrator.initiateScan();
         // new IntentIntegrator(getCurrentActivity()).initiateScan();
         reactContext.addActivityEventListener(mActivityEventListener);
     }
