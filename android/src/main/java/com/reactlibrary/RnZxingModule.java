@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.NativeModule;
@@ -18,7 +19,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 
-public class RnZxingModule extends ReactContextBaseJavaModule  implements ActivityEventListener {
+public class RnZxingModule extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
     private Callback mCallback;
 
@@ -31,7 +32,7 @@ public class RnZxingModule extends ReactContextBaseJavaModule  implements Activi
     public void showQrReader(Callback callback) {
         mCallback = callback;
         new IntentIntegrator(getCurrentActivity()).initiateScan();
-        reactContext.addActivityEventListener(this);
+        reactContext.addActivityEventListener(mActivityEventListener);
     }
 
     @Override
@@ -39,14 +40,17 @@ public class RnZxingModule extends ReactContextBaseJavaModule  implements Activi
         return "RnZxingModule";
     }
 
-    @Override
-    public void onNewIntent(Intent intent) {}
-
-    @Override
-    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        mCallback.invoke(result.getContents(), result.getBarcodeImagePath());
-        reactContext.removeActivityEventListener(this);
-    }
+    private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
+        @Override
+        public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if(result != null){
+                if(result.getContents() != null){
+                    mCallback.invoke(result.getContents(), result.getBarcodeImagePath());
+                    reactContext.removeActivityEventListener(this);
+                }
+            }
+        }
+    };
 
 }
