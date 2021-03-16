@@ -35,6 +35,20 @@ public class RnZxingModule extends ReactContextBaseJavaModule {
         reactContext.addActivityEventListener(mActivityEventListener);
     }
 
+    @ReactMethod
+    public void showBoletoReader(Callback callback) {
+        mCallback = callback;
+        IntentIntegrator integrator = new IntentIntegrator(getCurrentActivity());
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.ITF);
+        // integrator.setPrompt("Scan a barcode");
+        // integrator.setBeepEnabled(false);
+        // integrator.setTorchEnabled(false);
+        integrator.setBarcodeImageEnabled(false);
+        integrator.initiateScan()
+        // new IntentIntegrator(getCurrentActivity()).initiateScan();
+        reactContext.addActivityEventListener(mActivityEventListener);
+    }
+
     @Override
     public String getName() {
         return "RnZxingModule";
@@ -49,6 +63,8 @@ public class RnZxingModule extends ReactContextBaseJavaModule {
                     mCallback.invoke(result.getContents(), result.getBarcodeImagePath());
                     reactContext.removeActivityEventListener(this);
                 }
+            } else {
+               super.onActivityResult(activity, requestCode, resultCode, data);
             }
         }
     };
